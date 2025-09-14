@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation";
 import { Building2, Home, LayoutGrid, Trees, Hammer, MessageCircle, ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ContactSection } from "@/components/ContactSection";
+import { FAQSection } from "@/components/FAQSection";
 import { Link } from "react-router-dom";
 
 // Project data
@@ -408,6 +409,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* Contact Section */}
       <ContactSection />

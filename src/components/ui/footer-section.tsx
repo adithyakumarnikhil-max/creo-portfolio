@@ -57,14 +57,28 @@ const footerLinks: FooterSection[] = [
 
 export function Footer() {
   return (
-    <div className="w-full bg-black">
-      <footer className="relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center rounded-t-4xl px-6 py-12 lg:py-16">
+    <div className="w-full bg-black relative z-10">
+      <div className="absolute inset-0 bg-black -z-10"></div>
+      <footer id="contact" className="relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center rounded-t-4xl px-6 py-12 lg:py-16">
       <div className="grid w-full gap-8 xl:grid-cols-3 xl:gap-8">
         <AnimatedContainer className="space-y-4">
           <FrameIcon className="size-8" />
-          <p className="text-muted-foreground mt-8 text-sm md:mt-0">
-            © {new Date().getFullYear()} CREO. All rights reserved.
-          </p>
+          <div className="text-white text-sm space-y-2">
+            <p>Contact Ar. Pavankumar.K</p>
+            <p>CREO DESIGNERS</p>
+            <p>#37, 21st main, JP Nagar, 2nd phase,</p>
+            <p>Marenahalli, Bangalore - 560078</p>
+            <div className="mt-2 space-y-1">
+              <a href="tel:+919705075741" className="hover:text-white transition-colors flex items-center gap-1">
+                <Phone className="w-4 h-4" />
+                <span>+91 97050 75741</span>
+              </a>
+              <a href="mailto:pavankumar.k@creodesigners.com" className="hover:text-white transition-colors">
+                pavankumar.k@creodesigners.com
+              </a>
+            </div>
+            <p className="mt-4">© {new Date().getFullYear()} CREO. All rights reserved.</p>
+          </div>
         </AnimatedContainer>
 
         <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-4 xl:col-span-2 xl:mt-0">
@@ -72,7 +86,7 @@ export function Footer() {
             <AnimatedContainer key={section.label} delay={0.1 + index * 0.1}>
               <div className="mb-10 md:mb-0">
                 <h3 className="text-xs">{section.label}</h3>
-                <ul className="text-muted-foreground mt-4 space-y-2 text-sm">
+                <ul className="text-white/80 hover:text-white mt-4 space-y-2 text-sm">
                   {section.links.map((link) => (
                     <li key={link.title}>
                       <a
@@ -90,6 +104,7 @@ export function Footer() {
           ))}
         </div>
       </div>
+      
       </footer>
     </div>
   );

@@ -1,5 +1,5 @@
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { X, ChevronLeft, ChevronRight, Maximize2, Minimize2 } from 'lucide-react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface ProjectImage {
   url: string;
@@ -32,6 +32,35 @@ interface ProjectModalProps {
 export function ProjectModal({ project, projects, onClose, onProjectChange }: ProjectModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  const toggleFullscreen = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    const imageContainer = document.getElementById(`image-${project.id}`);
+    if (!document.fullscreenElement) {
+      imageContainer?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+      setIsFullscreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    }
+  }, [project.id]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -56,26 +85,53 @@ export function ProjectModal({ project, projects, onClose, onProjectChange }: Pr
     };
   }, [onClose]);
 
-  const handleNext = () => {
+  const handleNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setCurrentImageIndex((prevIndex) => 
       prevIndex === project.images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const handlePrev = () => {
+  const handlePrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setCurrentImageIndex((prevIndex) => 
       prevIndex === 0 ? project.images.length - 1 : prevIndex - 1
     );
+  };
+
+  const handleThumbnailClick = (e: React.MouseEvent, index: number) => {
+    e.stopPropagation();
+    setCurrentImageIndex(index);
   };
 
 
   if (!project) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity duration-300"
+      style={{ opacity: isModalOpen ? 1 : 0, pointerEvents: isModalOpen ? 'auto' : 'none' }}
+      onClick={(e) => {
+        // Close modal if clicking on the backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="relative w-full max-w-6xl max-h-[90vh] mx-4 bg-gray-900 rounded-2xl overflow-hidden flex flex-col lg:flex-row">
         {/* Close Button */}
         <div className="absolute top-4 right-4 z-10 flex gap-2">
+              <button
+                onClick={toggleFullscreen}
+                className="p-2 bg-black/50 text-white hover:bg-black/70 rounded-full transition-colors"
+                aria-label="Toggle Fullscreen"
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="w-5 h-5" />
+                ) : (
+                  <Maximize2 className="w-5 h-5" />
+                )}
+              </button>
           <button
             onClick={onClose}
             className="p-2 bg-black/50 text-white hover:bg-black/70 rounded-full transition-colors"
@@ -89,36 +145,30 @@ export function ProjectModal({ project, projects, onClose, onProjectChange }: Pr
         {/* Left Side - Image Carousel */}
         <div className="w-full lg:w-1/2 h-96 lg:h-auto relative bg-black">
           {/* Main Image */}
-          <div className="relative w-full h-full">
+          <div 
+            id={`image-${project.id}`}
+            className="relative w-full h-full flex items-center justify-center"
+            onClick={toggleFullscreen}
+          >
             <img
               src={project.images[currentImageIndex]?.url}
               alt={project.images[currentImageIndex]?.alt || project.title}
-              className="w-full h-full object-contain"
+              className={`w-full h-full object-contain cursor-zoom-in ${isFullscreen ? 'max-w-screen max-h-screen' : ''}`}
             />
 
             {/* Image Navigation Arrows */}
             {project.images.length > 1 && (
               <>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePrev();
-                  }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/60 text-white rounded-full hover:bg-black/80 transition-all hover:scale-110"
+                  onClick={handlePrev}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-20"
                   aria-label="Previous image"
-                  style={{
-                    backdropFilter: 'blur(4px)',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                  }}
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleNext();
-                  }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-black/60 text-white rounded-full hover:bg-black/80 transition-all hover:scale-110"
+                  onClick={handleNext}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-20"
                   aria-label="Next image"
                   style={{
                     backdropFilter: 'blur(4px)',
