@@ -61,16 +61,20 @@ export function FAQSection() {
           {faqItems.map((item, index) => (
             <div key={index} className="w-full">
               <div 
-                className="w-full py-4 border-b border-white/10 cursor-pointer transition-colors duration-200 hover:bg-white/5"
+                className="w-full py-4 px-2 sm:px-4 border-b border-white/10 cursor-pointer transition-colors duration-200 hover:bg-white/5"
                 onClick={() => toggleAccordion(index)}
               >
-                <div className="flex justify-between items-center w-full max-w-full">
-                  <h3 className="text-lg md:text-xl font-medium text-white pr-4 truncate">{item.question}</h3>
-                  {openIndex === index ? (
-                    <ChevronUp className="flex-shrink-0 w-5 h-5 text-white/70" />
-                  ) : (
-                    <ChevronDown className="flex-shrink-0 w-5 h-5 text-white/70" />
-                  )}
+                <div className="flex justify-between items-start w-full max-w-full gap-4">
+                  <h3 className="text-lg md:text-xl font-medium text-white flex-1 break-words pr-2">
+                    {item.question}
+                  </h3>
+                  <div className="flex-shrink-0 pt-1">
+                    {openIndex === index ? (
+                      <ChevronUp className="w-5 h-5 text-white/70" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-white/70" />
+                    )}
+                  </div>
                 </div>
                 <div 
                   className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'mt-3 max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
